@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}All Items{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-cubes"></i> Items Management</h2>
+
+<!-- ADD BUTTON -->
+<div style="margin: 1.5rem 0;">
+    <a href="/items/add" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Add New Item
+    </a>
+</div>
+
+<!-- ITEMS TABLE -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-table"></i> Current items
+    </div>
+    <div class="card-body" style="padding: 0;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Offer</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if items and items|length > 0 %}
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ loop.index0 }}</td>
+                        <td>{{ item.name }}</td>
+                        <td>${{ "%.2f"|format(item.price) }}</td>
+                        <td>
+                            {% if item.is_offer %}
+                                <span class="badge">Yes</span>
+                            {% else %}
+                                <span class="badge badge-secondary">No</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/items/edit/{{ loop.index0 }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="/items/delete/{{ loop.index0 }}" class="btn btn-danger btn-sm">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="5" class="text-center">No items found. Add one!</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

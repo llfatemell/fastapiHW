@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Laptop",
+    "price": 999.99,
+    "is_offer": false,
+    "tax": 99.999
+  },
+  {
+    "name": "Smartphone",
+    "price": 499.50,
+    "is_offer": true,
+    "tax": 49.95
+  },
+  {
+    "name": "Headphones",
+    "price": 79.99,
+    "is_offer": false,
+    "tax": 7.999
+  }
+]
