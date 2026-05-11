@@ -1,3 +1,9 @@
+/* ============================================================
+   custom.css – Minimal styling for our CRUD app
+   No frameworks, only essential rules.
+   ============================================================ */
+
+/* ---------- RESET & GLOBAL ---------- */
 * {
     margin: 0;
     padding: 0;
@@ -180,4 +186,4 @@ input:focus {
 .mb-4 { margin-bottom: 1.5rem; }
 .gap-2 { gap: 0.5rem; }
 .d-flex { display: flex; }
-.justify-between { justify-content: space-between; } 
+.justify-between { justify-content: space-between; }

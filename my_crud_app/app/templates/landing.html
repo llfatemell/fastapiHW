@@ -5,6 +5,37 @@
 {% block content %}
 <h2><i class="fas fa-cubes"></i> Items Management</h2>
 
+<!-- FILTER CARD -->
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-filter"></i> Filter by price
+    </div>
+    <div class="card-body">
+        <form method="GET" action="/items/search">
+            <div class="d-flex gap-2" style="flex-wrap: wrap;">
+                <div style="flex: 1;">
+                    <label>Min price ($)</label>
+                    <input type="number" name="min_price" step="0.01"
+                           value="{{ min_price if min_price is defined else '' }}">
+                </div>
+                <div style="flex: 1;">
+                    <label>Max price ($)</label>
+                    <input type="number" name="max_price" step="0.01"
+                           value="{{ max_price if max_price is defined else '' }}">
+                </div>
+                <div style="align-self: flex-end;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="/items/landing" class="btn btn-secondary">
+                        <i class="fas fa-undo-alt"></i> Reset
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
 <!-- ADD BUTTON -->
 <div style="margin: 1.5rem 0;">
     <a href="/items/add" class="btn btn-primary">
@@ -12,7 +43,7 @@
     </a>
 </div>
 
-<!-- ITEMS TABLE -->
+<!-- ITEMS TABLE (same as before) -->
 <div class="card">
     <div class="card-header">
         <i class="fas fa-table"></i> Current items

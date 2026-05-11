@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi import Form, status
+from fastapi.responses import RedirectResponse
+from fastapi import HTTPException
+from app.models import Item
 import json
 import os
 
@@ -22,3 +26,139 @@ async def landing_page(request: Request):
         name="landing.html",
         context={"items": items}
     )
+@router.get("/add", response_class=HTMLResponse)
+async def add_item_form(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="item_form.html",
+        context={"editing": False, "item": None, "item_id": None}
+    )
+
+
+@router.post("/")
+async def create_item(
+    name: str = Form(...),
+    price: float = Form(...),
+    is_offer: bool = Form(False)
+):
+    items = load_items()
+    new_item = {
+        "name": name,
+        "price": price,
+        "is_offer": is_offer,
+        "tax": price * 0.1
+    }
+    items.append(new_item)
+    with open(DATA_FILE, "w") as f:
+        json.dump(items, f, indent=4)
+    return RedirectResponse("/items/landing", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/edit/{item_id}", response_class=HTMLResponse)
+async def edit_item_form(request: Request, item_id: int):
+    items = load_items()
+    if item_id < 0 or item_id >= len(items):
+        raise HTTPException(status_code=404, detail="Item not found")
+    return templates.TemplateResponse(
+        request=request,
+        name="item_form.html",
+        context={"editing": True, "item": items[item_id], "item_id": item_id}
+    )
+
+@router.post("/{item_id}")
+async def update_item(
+    item_id: int,
+    name: str = Form(...),
+    price: float = Form(...),
+    is_offer: bool = Form(False)
+):
+    items = load_items()
+    if item_id < 0 or item_id >= len(items):
+        raise HTTPException(status_code=404, detail="Item not found")
+    updated_item = {
+        "name": name,
+        "price": price,
+        "is_offer": is_offer,
+        "tax": price * 0.1
+    }
+    items[item_id] = updated_item
+    with open(DATA_FILE, "w") as f:
+        json.dump(items, f, indent=4)
+    return RedirectResponse("/items/landing", status_code=status.HTTP_303_SEE_OTHER)
+@router.get("/delete/{item_id}", response_class=HTMLResponse)
+async def confirm_delete(request: Request, item_id: int):
+    items = load_items()
+    if item_id < 0 or item_id >= len(items):
+        raise HTTPException(status_code=404, detail="Item not found")
+    return templates.TemplateResponse(
+        request=request,
+        name="delete_confirm.html",
+        context={"item": items[item_id], "item_id": item_id}
+    )
+@router.post("/delete/{item_id}")
+async def delete_item(item_id: int):
+    items = load_items()
+    if item_id < 0 or item_id >= len(items):
+        raise HTTPException(status_code=404, detail="Item not found")
+    items.pop(item_id)
+    with open(DATA_FILE, "w") as f:
+        json.dump(items, f, indent=4)
+    return RedirectResponse("/items/landing", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/search")
+async def search_items(
+    request: Request,
+    min_price: float = None,
+    max_price: float = None
+):
+    items = load_items()
+    filtered = []
+    for item in items:
+        price = item["price"]
+        if min_price is not None and price < min_price:
+            continue
+        if max_price is not None and price > max_price:
+            continue
+        filtered.append(item)
+    return templates.TemplateResponse(
+        request=request,
+        name="landing.html",
+        context={
+            "items": filtered,
+            "min_price": min_price,
+            "max_price": max_price
+        }
+    )
+
+api_router = APIRouter(prefix="/api/items", tags=["api"])
+
+@api_router.get("/")
+async def api_read_items():
+    items = load_items()
+    return {"items": items, "count": len(items)}
+
+@api_router.post("/")
+async def api_create_item(item: Item):
+    items = load_items()
+    item.tax = item.price * 0.1
+    items.append(item.model_dump())
+    save_items(items)
+    return {"message": "Item created", "item": item}
+
+@api_router.put("/{item_id}")
+async def api_update_item(item_id: int, item: Item):
+    items = load_items()
+    if item_id < 0 or item_id >= len(items):
+        raise HTTPException(status_code=404, detail="Item not found")
+    item.tax = item.price * 0.1
+    items[item_id] = item.model_dump()
+    save_items(items)
+    return {"message": "Item updated", "item": item}
+
+@api_router.delete("/{item_id}")
+async def api_delete_item(item_id: int):
+    items = load_items()
+    if item_id < 0 or item_id >= len(items):
+        raise HTTPException(status_code=404, detail="Item not found")
+    deleted = items.pop(item_id)
+    save_items(items)
+    return {"message": "Item deleted", "deleted": deleted}            

@@ -457,6 +457,7 @@ Create `app/templates/landing.html`. This template extends `base.html` and shows
 {% endblock %}
 ```
 
+
 ### 3.3 Main FastAPI app
 
 Create `app/main.py` to mount static files and include the router.
