@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}{% if editing %}Edit{% else %}Create{% endif %} Item{% endblock %}
+
+{% block content %}
+<h2>{% if editing %}Edit{% else %}Create New{% endif %} Item</h2>
+
+<form action="{% if editing %}/items/{{ item_id }}{% else %}/items/{% endif %}" method="post">
+<div>
+<label for="name">Name:</label>
+<input type="text" id="name" name="name" value="{{ name if editing else '' }}" required>
+</div>
+
+<div>
+<label for="price">Price:</label>
+<input type="number" id="price" name="price" step="0.01" value="{{ price if editing else '' }}" required>
+</div>
+
+<div>
+<label for="is_offer">
+<input type="checkbox" id="is_offer" name="is_offer" {% if editing and is_offer %}checked{% endif %}>
+Special Offer
+</label>
+</div>
+
+<div>
+<button type="submit" class="btn">{% if editing %}Update{% else %}Create{% endif %}</button>
+<a href="/items/" class="btn" style="background: #6c757d;">Cancel</a>
+</div>
+</form>
+{% endblock %}

@@ -34,7 +34,6 @@ async def add_item_form(request: Request):
         context={"editing": False, "item": None, "item_id": None}
     )
 
-
 @router.post("/")
 async def create_item(
     name: str = Form(...),
